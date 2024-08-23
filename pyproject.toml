@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "Event Sourcing in python"
+version = "0.1.0"
+description = "Implementing Event Sourcing in Python"
+authors = ["https://github.com/Enforcer, https://github.com/dclimber"]
+license = "MIT"
+
+[[tool.poetry.source]]
+name = "PyPI"
+priority = "primary"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.0"
+coverage = "^7.5.1"
+pytest-cov = "^3.0.0"
+pytest-icdiff = "^0.6"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
