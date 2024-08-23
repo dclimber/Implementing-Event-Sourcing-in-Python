@@ -1,4 +1,6 @@
 import dataclasses
+import functools
+from typing import Optional
 
 
 @dataclasses.dataclass(frozen=True)
@@ -11,33 +13,37 @@ class StatusChanged:
     new_status: str
 
 
+def method_dispatch(func):
+    dispatcher = functools.singledispatch(func)
+
+    def wrapper(*args, **kw):
+        return dispatcher.dispatch(args[1].__class__)(*args, **kw)
+
+    wrapper.register = dispatcher.register
+    functools.update_wrapper(wrapper, func)
+    return wrapper
+
+
+@dataclasses.dataclass()
 class Order:
+    user_id: Optional[int] = None
+    status: str = ""
+
     def __init__(self, events: list):  # 1
         for event in events:
             self.apply(event)  # 2
 
         self.changes = []  # 3
 
+    @method_dispatch
     def apply(self, event):
-        if isinstance(event, OrderCreated):
-            self.user_id = event.user_id
-            self.status = "new"
-        elif isinstance(event, StatusChanged):
-            self.status = event.new_status
-        else:
-            raise ValueError("Unknown event!")
+        raise ValueError("Unknown event!")
 
-    def set_status(self, new_status: str):  # 5
-        if new_status not in ("new", "paid", "confirmed", "shipped"):
-            raise ValueError(f"{new_status} is not a correct status!")
+    @apply.register(OrderCreated)
+    def _(self, event: OrderCreated):
+        self.user_id = event.user_id
+        self.status = "new"
 
-        event = StatusChanged(new_status)  # 6
-        self.apply(event)
-        self.changes.append(event)  # 7
-
-    @classmethod
-    def create(cls, user_id: int):
-        initial_event = OrderCreated(user_id)
-        instance = cls([initial_event])
-        instance.changes = [initial_event]
-        return instance
+    @apply.register(StatusChanged)
+    def _(self, event: StatusChanged):
+        self.status = event.new_status
