@@ -11,6 +11,7 @@ priority = "primary"
 
 [tool.poetry.dependencies]
 python = "^3.11"
+sqlalchemy = "^2.0.32"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.0"
