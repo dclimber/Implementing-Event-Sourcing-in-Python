@@ -25,6 +25,7 @@ pytest-cov = "^3.0.0"
 pytest-icdiff = "^0.6"
 testcontainers = "^4.8.0"
 pytest-asyncio = "^0.24.0"
+pytest-bdd = "^7.2.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
