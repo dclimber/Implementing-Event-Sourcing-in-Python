@@ -6,9 +6,9 @@ from sqlalchemy.orm import sessionmaker
 from testcontainers.postgres import PostgresContainer
 
 from orders.adapters.postgres_event_store.event_store import PostgreSQLEventStore
-from orders.adapters.postgres_event_store.tables import AggregateModel, Base, EventModel
+from orders.adapters.postgres_event_store.tables import Base
 from orders.domain import events
-from orders.domain.models import ConcurrentStreamWriteError, EventsStream
+from orders.domain.models import ConcurrentStreamWriteError
 
 
 @pytest.fixture(scope="module")

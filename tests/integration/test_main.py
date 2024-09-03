@@ -15,7 +15,10 @@ from orders.main import main
 
 def convert_sqlalchemy_dsn_to_psycopg2(dsn):
     parsed = urlparse(dsn)
-    return f"dbname={parsed.path[1:]} user={parsed.username} password={parsed.password} host={parsed.hostname} port={parsed.port}"
+    return (
+        f"dbname={parsed.path[1:]} user={parsed.username} password={parsed.password}"
+        f" host={parsed.hostname} port={parsed.port}"
+    )
 
 
 @pytest.fixture(scope="module")
