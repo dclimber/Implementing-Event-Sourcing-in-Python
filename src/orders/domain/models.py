@@ -2,13 +2,14 @@ import abc
 import dataclasses
 import functools
 import uuid
+from typing import List, Optional
 
 from orders.domain import events
 
 
-@dataclasses.dataclass()
+@dataclasses.dataclass
 class EventsStream:
-    events: list[events.Event]
+    events: List[events.Event]
     version: int
 
 
@@ -22,8 +23,8 @@ class EventStore(metaclass=abc.ABCMeta):
     def append_to_stream(
         self,
         aggregate_uuid: uuid.UUID,
-        expected_version: int | None,
-        events: list[events.Event],
+        expected_version: Optional[int],
+        events: List[events.Event],
     ) -> None:
         pass
 
@@ -43,18 +44,19 @@ def method_dispatch(func):
     return wrapper
 
 
-@dataclasses.dataclass()
+@dataclasses.dataclass
 class Order:
-    user_id: int | None = None
+    user_id: Optional[int] = None
     status: str = ""
+    version: int = 0
 
-    def __init__(self, event_stream: EventsStream):  # 1
+    def __init__(self, event_stream: EventsStream):
         self.version = event_stream.version
 
         for event in event_stream.events:
-            self.apply(event)  # 2
+            self.apply(event)
 
-        self.changes = []  # 3
+        self.changes = []
 
     @method_dispatch
     def apply(self, event: events.Event):
