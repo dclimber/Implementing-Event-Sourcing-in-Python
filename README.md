@@ -1,6 +1,11 @@
 # Event Sourcing in Python
 
-This repository contains the source code inspired by the blog post series [Implementing Event Sourcing in Python](https://breadcrumbscollector.tech/categories/event-sourcing//) with updates for 2024. 
+This repository contains the source code inspired by the blog post series [Implementing Event Sourcing in Python](https://breadcrumbscollector.tech/categories/event-sourcing//) with updates for 2024.
+
+## Parts
+
+1. Branch for [part 1](https://breadcrumbscollector.tech/implementing-event-sourcing-in-python-part-1-aggregates/) is [here](https://github.com/dclimber/Implementing-Event-Sourcing-in-Python/tree/part-1)
+2. Branch for [part 2](https://breadcrumbscollector.tech/implementing-event-sourcing-in-python-part-2-robust-event-store-atop-postgresql/) is [here](https://github.com/dclimber/Implementing-Event-Sourcing-in-Python/tree/part2)
 
 ## Getting Started
 
