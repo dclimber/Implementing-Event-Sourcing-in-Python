@@ -2,7 +2,8 @@ import asyncio
 
 import aiopg
 
-dsn = "dbname=XXX user=XXX password=XXX host=127.0.0.1"  # change this to your actual database credentials
+# change this to your actual database credentials
+dsn = "dbname=XXX user=XXX password=XXX host=127.0.0.1"
 
 
 async def listen(conn):
@@ -15,7 +16,8 @@ async def listen(conn):
 
 async def main(dsn=None):
     if not dsn:
-        dsn = "dbname=XXX user=XXX password=XXX host=127.0.0.1"  # default value or environment variable
+        # default value or environment variable
+        dsn = "dbname=XXX user=XXX password=XXX host=127.0.0.1"
     async with aiopg.create_pool(dsn) as pool:
         async with pool.acquire() as conn:
             listener = listen(conn)

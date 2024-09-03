@@ -1,21 +1,20 @@
 import json
 import uuid
-from typing import List, Type
+from typing import Type
 
 import sqlalchemy as sql
 from sqlalchemy import exc, text
 
 from orders.adapters.postgres_event_store import tables
-from orders.domain import events
-from orders.domain.models import ConcurrentStreamWriteError, EventsStream, EventStore
+from orders.domain import event_store, events, exceptions
 
 
-class PostgreSQLEventStore(EventStore):
+class PostgreSQLEventStore(event_store.EventStore):
 
     def __init__(self, session: sql.orm.Session):
         self.session = session
 
-    def load_stream(self, aggregate_uuid: uuid.UUID) -> EventsStream:
+    def load_stream(self, aggregate_uuid: uuid.UUID) -> event_store.EventsStream:
         try:
             aggregate = (
                 self.session.query(tables.AggregateModel)
@@ -29,13 +28,15 @@ class PostgreSQLEventStore(EventStore):
         events_objects = [
             self._translate_to_object(event_model) for event_model in aggregate.events
         ]
-        return EventsStream(events=events_objects, version=aggregate.version)
+        return event_store.EventsStream(
+            events=events_objects, version=aggregate.version
+        )
 
     def append_to_stream(
         self,
         aggregate_uuid: uuid.UUID,
         expected_version: int,
-        events: List[events.Event],
+        events: list[events.Event],
     ) -> None:
         connection = self.session.connection()
 
@@ -50,14 +51,14 @@ class PostgreSQLEventStore(EventStore):
             )
             result_proxy = connection.execute(stmt)
             if result_proxy.rowcount != 1:
-                raise ConcurrentStreamWriteError()
+                raise exceptions.ConcurrentStreamWriteError()
         else:
             stmt = tables.AggregateModel.__table__.insert().values(
                 uuid=str(aggregate_uuid), version=len(events)
             )
             connection.execute(stmt)
 
-        for i, event in enumerate(events):
+        for event in events:
             event_as_dict = event.as_dict()
             connection.execute(
                 tables.EventModel.__table__.insert().values(
@@ -72,7 +73,10 @@ class PostgreSQLEventStore(EventStore):
             connection.execute(
                 notify_stmt,
                 {
-                    "payload": f"{str(aggregate_uuid)}_{event.__class__.__name__}_{payload}"
+                    "payload": (
+                        f"{str(aggregate_uuid)}_{event.__class__.__name__}"
+                        f"_{payload}"
+                    )
                 },
             )
 

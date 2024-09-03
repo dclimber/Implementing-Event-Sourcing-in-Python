@@ -1,9 +1,10 @@
 import pytest
 from pytest_bdd import given, scenarios, then, when
 
-from orders.adapters.postgres_event_store.event_store import ConcurrentStreamWriteError
 from orders.domain import events
-from orders.domain.models import EventsStream, Order
+from orders.domain.event_store import EventsStream
+from orders.domain.exceptions import ConcurrentStreamWriteError
+from orders.domain.models import Order
 
 # Load the scenarios from the feature file
 scenarios("../../features/event_handling.feature")

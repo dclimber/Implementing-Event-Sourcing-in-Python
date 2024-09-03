@@ -8,7 +8,7 @@ from testcontainers.postgres import PostgresContainer
 from orders.adapters.postgres_event_store.event_store import PostgreSQLEventStore
 from orders.adapters.postgres_event_store.tables import Base
 from orders.domain import events
-from orders.domain.models import ConcurrentStreamWriteError
+from orders.domain.exceptions import ConcurrentStreamWriteError
 
 
 @pytest.fixture(scope="module")
