@@ -1,8 +1,10 @@
-from orders.domain import events, models
+from orders.domain import events
+from orders.domain.models import EventsStream, Order
 
 
 def test_order_without_event_has_no_changes():
-    order = models.Order([])
+    event_stream = EventsStream(events=[], version=0)
+    order = Order(event_stream)
 
     assert order.changes == []
     assert order.user_id is None
@@ -10,34 +12,34 @@ def test_order_without_event_has_no_changes():
 
 
 def test_order_gets_created_after_order_created_event():
-    order_created = models.OrderCreated(user_id=1)
-    input_events = [order_created]
+    order_created = events.OrderCreated(user_id=1)
+    event_stream = EventsStream(events=[order_created], version=1)
 
-    order = models.Order(input_events)
+    order = Order(event_stream)
 
-    assert order.user_id is not None
+    assert order.user_id == 1
     assert isinstance(order.user_id, int)
     assert order.status == "new"
 
 
 def test_error_is_raised_if_unknown_event_is_passed_in():
-    order_created = events.OrderCreated(user_id=1)
-    input_events = [order_created]
+    event_stream = EventsStream(events=[], version=0)
+    order = Order(event_stream)
 
-    order = models.Order(input_events)
-
-    assert order.user_id is not None
-    assert isinstance(order.user_id, int)
-    assert order.status == "new"
+    try:
+        order.apply("UnknownEvent")
+        assert False, "Expected ValueError for unknown event"
+    except ValueError:
+        pass
 
 
 def test_order_status_changes_after_status_changed_event():
     order_created = events.OrderCreated(user_id=1)
     status_changed = events.StatusChanged(new_status="confirmed")
-    input_events = [order_created, status_changed]
+    event_stream = EventsStream(events=[order_created, status_changed], version=2)
 
-    order = models.Order(input_events)
+    order = Order(event_stream)
 
-    assert order.user_id is not None
+    assert order.user_id == 1
     assert isinstance(order.user_id, int)
     assert order.status == "confirmed"
